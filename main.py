@@ -1,5 +1,8 @@
+import os
+
 INIT_PROGRAM_FILE = './resources/Init_Program.prog_bin'
-PROGRAM_NAME = "Logiemin 1"
+BIN_OUT_FILE = './out/Prog_000.prog_bin'
+PROGRAM_NAME = 'Logieminu 1'
 LINE_LENGTH = 32
 
 
@@ -11,11 +14,16 @@ def read_init_program():
 def modify_program(program):
     # Set the program name at position 0x00000004, fixed length 16
     program_name_bytes = '{:16.16}'.format(PROGRAM_NAME).encode('utf-8')
-    program[4:len(program_name_bytes)] = program_name_bytes
+    program[4:len(program_name_bytes) + 4] = program_name_bytes
 
 
-def write_program():
-    pass
+def write_program(program):
+    print(f'Writing bytes to {BIN_OUT_FILE}')
+    pretty_print(program)
+
+    os.makedirs(os.path.dirname(BIN_OUT_FILE), exist_ok=True)
+    with open(BIN_OUT_FILE, 'wb') as f:
+        f.write(program)
 
 
 def pretty_print(program):
@@ -28,4 +36,4 @@ def pretty_print(program):
 if __name__ == '__main__':
     program_bytes = read_init_program()
     modify_program(program_bytes)
-    pretty_print(program_bytes)
+    write_program(program_bytes)
