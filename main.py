@@ -1,10 +1,17 @@
 INIT_PROGRAM_FILE = './resources/Init_Program.prog_bin'
+PROGRAM_NAME = "Logiemin 1"
 LINE_LENGTH = 32
 
 
 def read_init_program():
     with open(INIT_PROGRAM_FILE, 'rb') as f:
         return bytearray(f.read())
+
+
+def modify_program(program):
+    # Set the program name at position 0x00000004, fixed length 16
+    program_name_bytes = '{:16.16}'.format(PROGRAM_NAME).encode('utf-8')
+    program[4:len(program_name_bytes)] = program_name_bytes
 
 
 def write_program():
@@ -19,5 +26,6 @@ def pretty_print(program):
 
 
 if __name__ == '__main__':
-    program = read_init_program()
-    pretty_print(program)
+    program_bytes = read_init_program()
+    modify_program(program_bytes)
+    pretty_print(program_bytes)
