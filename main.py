@@ -1,16 +1,23 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+INIT_PROGRAM_FILE = './resources/Init_Program.prog_bin'
+LINE_LENGTH = 32
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def read_init_program():
+    with open(INIT_PROGRAM_FILE, 'rb') as f:
+        return bytearray(f.read())
 
 
-# Press the green button in the gutter to run the script.
+def write_program():
+    pass
+
+
+def pretty_print(program):
+    hex_string = ''.join('{:02x}'.format(x) for x in program)
+    lines = [hex_string[i:i + LINE_LENGTH] for i in range(0, len(hex_string), LINE_LENGTH)]
+    for line in lines:
+        print(' '.join(line[i:i+2] for i in range(0, len(line), 2)).upper())
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    program = read_init_program()
+    pretty_print(program)
