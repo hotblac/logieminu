@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<KorgMSLibrarian_Data>
+  <Product>minilogue</Product>
+  <Contents NumFavoriteData="0" NumProgramData="1" NumPresetInformation="0">
+    <ProgramData>
+      <Information>Prog_000.prog_info</Information>
+      <ProgramBinary>Prog_000.prog_bin</ProgramBinary>
+    </ProgramData>
+  </Contents>
+</KorgMSLibrarian_Data>

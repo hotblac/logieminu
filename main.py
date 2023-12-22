@@ -1,10 +1,14 @@
 import os
 import random
+import zipfile
 
-INIT_PROGRAM_FILE = './resources/Init_Program.prog_bin'
-BIN_OUT_FILE = './out/Prog_000.prog_bin'
+RESOURCES_DIR = './resources/'
+OUT_DIR = './out/'
+INIT_PROGRAM_FILE = RESOURCES_DIR + 'Init_Program.prog_bin'
+BIN_OUT_FILE = OUT_DIR + 'Prog_000.prog_bin'
 PROGRAM_NAME = 'Logieminu 1'
 LINE_LENGTH = 32
+
 
 ANY_BYTE = list(range(0, 0xFF))
 FIDDLEABLE_BYTES = {
@@ -72,6 +76,14 @@ def write_program(program):
         f.write(program)
 
 
+def assemble():
+    with zipfile.ZipFile('logieminu.mnlgprog', 'w') as zf:
+        zf.write(os.path.join(RESOURCES_DIR, 'FileInformation.xml'), 'FileInformation.xml')
+        for file in os.listdir(OUT_DIR):
+            zf.write(os.path.join(OUT_DIR, file), file)
+            zf.write(os.path.join(RESOURCES_DIR, 'Init_Program.prog_info'), 'Prog_000.prog_info')
+
+
 def pretty_print(program):
     hex_string = ''.join('{:02x}'.format(x) for x in program)
     lines = [hex_string[i:i + LINE_LENGTH] for i in range(0, len(hex_string), LINE_LENGTH)]
@@ -83,3 +95,4 @@ if __name__ == '__main__':
     program_bytes = read_init_program()
     modify_program(program_bytes)
     write_program(program_bytes)
+    assemble()
