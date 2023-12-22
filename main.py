@@ -8,8 +8,9 @@ RESOURCES_DIR = './resources/'
 OUT_DIR = './out/'
 ASSEMBLY_DIR = OUT_DIR + 'assembly/'
 INIT_PROGRAM_FILE = RESOURCES_DIR + 'Init_Program.prog_bin'
-PROGRAM_NAME = 'Logieminu 1'
+PROGRAM_NAME = 'Logieminu'
 LINE_LENGTH = 32
+PROGRAM_COUNT = 200
 
 
 ANY_BYTE = list(range(0, 0xFF))
@@ -63,9 +64,10 @@ def read_init_program():
         return bytearray(f.read())
 
 
-def modify_program(program):
+def modify_program(program, index):
     # Set the program name at position 0x00000004, fixed length 16
-    program_name_bytes = '{:16.16}'.format(PROGRAM_NAME).encode('utf-8')
+    program_name = f'{PROGRAM_NAME} {index + 1:03d}'
+    program_name_bytes = '{:16.16}'.format(program_name).encode('utf-8')
     program[4:len(program_name_bytes) + 4] = program_name_bytes
 
     # Randomize all known program parameters
@@ -78,9 +80,10 @@ def write_program(path, program):
         f.write(program)
 
 
-def assemble():
-    with zipfile.ZipFile(os.path.join(OUT_DIR, 'logieminu.mnlgprog'), 'w') as zf:
+def assemble(path):
+    with zipfile.ZipFile(path, 'w') as zf:
         zf.write(os.path.join(RESOURCES_DIR, 'FileInformation.xml'), 'FileInformation.xml')
+        zf.write(os.path.join(RESOURCES_DIR, 'PresetInformation.xml'), 'PresetInformation.xml')
         for file in os.listdir(ASSEMBLY_DIR):
             zf.write(os.path.join(ASSEMBLY_DIR, file), file)
             prog_info_file_name = Path(file).stem + ".prog_info"
@@ -98,7 +101,11 @@ if __name__ == '__main__':
     clean()
     os.makedirs(os.path.dirname(ASSEMBLY_DIR), exist_ok=True)
 
-    program_bytes = read_init_program()
-    modify_program(program_bytes)
-    write_program(os.path.join(ASSEMBLY_DIR, 'Prog_000.prog_bin'), program_bytes)
-    assemble()
+    for i in range(0, PROGRAM_COUNT):
+        program_bytes = read_init_program()
+        modify_program(program_bytes, i)
+        write_program(os.path.join(ASSEMBLY_DIR, f'Prog_{i:03d}.prog_bin'), program_bytes)
+    out_path = os.path.join(OUT_DIR, 'logieminu.mnlgpreset')
+    assemble(out_path)
+
+    print(f'Created sound library at {out_path}')
