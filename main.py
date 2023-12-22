@@ -8,7 +8,7 @@ RESOURCES_DIR = './resources/'
 OUT_DIR = './out/'
 ASSEMBLY_DIR = OUT_DIR + 'assembly/'
 INIT_PROGRAM_FILE = RESOURCES_DIR + 'Init_Program.prog_bin'
-PROGRAM_NAME = 'Logieminu'
+PROGRAM_NAME = 'Logiemin'  # Keep 8 chars or fewer to fit on screen
 LINE_LENGTH = 32
 PROGRAM_COUNT = 200
 
