@@ -1,11 +1,13 @@
 import os
 import random
+import shutil
 import zipfile
+from pathlib import Path
 
 RESOURCES_DIR = './resources/'
 OUT_DIR = './out/'
+ASSEMBLY_DIR = OUT_DIR + 'assembly/'
 INIT_PROGRAM_FILE = RESOURCES_DIR + 'Init_Program.prog_bin'
-BIN_OUT_FILE = OUT_DIR + 'Prog_000.prog_bin'
 PROGRAM_NAME = 'Logieminu 1'
 LINE_LENGTH = 32
 
@@ -52,6 +54,10 @@ FIDDLEABLE_BYTES = {
 }
 
 
+def clean():
+    shutil.rmtree(OUT_DIR, ignore_errors=True)
+
+
 def read_init_program():
     with open(INIT_PROGRAM_FILE, 'rb') as f:
         return bytearray(f.read())
@@ -67,21 +73,18 @@ def modify_program(program):
         program[offset] = random.choice(allowed_values)
 
 
-def write_program(program):
-    print(f'Writing bytes to {BIN_OUT_FILE}')
-    pretty_print(program)
-
-    os.makedirs(os.path.dirname(BIN_OUT_FILE), exist_ok=True)
-    with open(BIN_OUT_FILE, 'wb') as f:
+def write_program(path, program):
+    with open(path, 'wb') as f:
         f.write(program)
 
 
 def assemble():
-    with zipfile.ZipFile('logieminu.mnlgprog', 'w') as zf:
+    with zipfile.ZipFile(os.path.join(OUT_DIR, 'logieminu.mnlgprog'), 'w') as zf:
         zf.write(os.path.join(RESOURCES_DIR, 'FileInformation.xml'), 'FileInformation.xml')
-        for file in os.listdir(OUT_DIR):
-            zf.write(os.path.join(OUT_DIR, file), file)
-            zf.write(os.path.join(RESOURCES_DIR, 'Init_Program.prog_info'), 'Prog_000.prog_info')
+        for file in os.listdir(ASSEMBLY_DIR):
+            zf.write(os.path.join(ASSEMBLY_DIR, file), file)
+            prog_info_file_name = Path(file).stem + ".prog_info"
+            zf.write(os.path.join(RESOURCES_DIR, 'Init_Program.prog_info'), prog_info_file_name)
 
 
 def pretty_print(program):
@@ -92,7 +95,10 @@ def pretty_print(program):
 
 
 if __name__ == '__main__':
+    clean()
+    os.makedirs(os.path.dirname(ASSEMBLY_DIR), exist_ok=True)
+
     program_bytes = read_init_program()
     modify_program(program_bytes)
-    write_program(program_bytes)
+    write_program(os.path.join(ASSEMBLY_DIR, 'Prog_000.prog_bin'), program_bytes)
     assemble()
